@@ -1,0 +1,101 @@
+version: '1.0'
+
+name: 'email_automation'
+
+services:
+  app:
+    container_name: main-app
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    tty: true
+    env_file:
+      - .env
+    ports:
+      - 9000:9000
+    volumes:
+      - ./app:/app
+    depends_on:
+      - rabbitmq
+    networks:
+      - app-network
+
+  celery:
+    container_name: celery-worker
+    build:
+      context: .
+      dockerfile: celery/Dockerfile
+    tty: true
+    env_file:
+      - .env
+    ports:
+      - 9001:9001
+    volumes:
+      - ./app:/app
+    depends_on:
+      - rabbitmq
+    networks:
+      - app-network
+
+  database:
+    container_name: db
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootroot
+      MYSQL_DATABASE: main_db
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: test
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - app-network
+    
+  rabbitmq:
+    container_name: rabbitmq3
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmquser
+      - RABBITMQ_DEFAULT_PASS=rmqpass
+    ports:
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - app-network
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - 80:80
+    restart: always
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin:5.2.1
+    restart: always
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    ports:
+      - 8088:80
+    depends_on:
+      - database
+    networks:
+      - app-network
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge
+

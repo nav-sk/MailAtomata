@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from .env import ENV
+
+ENV.init_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -116,7 +121,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -125,4 +131,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Celery settings
-CELERY_BROKER_URL = "amqp://localhost"
+
+print(ENV.RABBITMQ_USER, ENV.RABBITMQ_PASSWORD, ENV.RABBITMQ_HOST)
+
+CELERY_BROKER_URL = (
+    f"amqp://{ENV.RABBITMQ_USER}:{ENV.RABBITMQ_PASSWORD}@{ENV.RABBITMQ_HOST}:5672//"
+)
