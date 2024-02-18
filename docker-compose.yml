@@ -9,6 +9,7 @@ services:
       context: .
       dockerfile: app/Dockerfile
     tty: true
+    restart: always
     env_file:
       - .env
     ports:
@@ -17,6 +18,7 @@ services:
       - ./app:/app
     depends_on:
       - rabbitmq
+      - mysql
     networks:
       - app-network
 
@@ -34,17 +36,16 @@ services:
       - ./app:/app
     depends_on:
       - rabbitmq
+      - mysql
     networks:
       - app-network
 
-  database:
+  mysql:
     container_name: db
     image: mysql:latest
     environment:
-      MYSQL_ROOT_PASSWORD: rootroot
+      MYSQL_ROOT_PASSWORD: tooroot
       MYSQL_DATABASE: main_db
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: test
     restart: unless-stopped
     volumes:
       - db-data:/var/lib/mysql
@@ -83,13 +84,13 @@ services:
     image: phpmyadmin/phpmyadmin:5.2.1
     restart: always
     environment:
-      PMA_HOST: database
+      PMA_HOST: mysql
       PMA_PORT: 3306
       PMA_ARBITRARY: 1
     ports:
       - 8088:80
     depends_on:
-      - database
+      - mysql
     networks:
       - app-network
 volumes:

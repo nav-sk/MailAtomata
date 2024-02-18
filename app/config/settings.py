@@ -80,9 +80,16 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": ENV.MYSQL_DATABASE,
+        "USER": ENV.MYSQL_USER,
+        "PASSWORD": ENV.MYSQL_PASSWORD,
+        "HOST": ENV.MYSQL_HOST,
     }
 }
 
@@ -131,9 +138,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Celery settings
-
-print(ENV.RABBITMQ_USER, ENV.RABBITMQ_PASSWORD, ENV.RABBITMQ_HOST)
-
 CELERY_BROKER_URL = (
     f"amqp://{ENV.RABBITMQ_USER}:{ENV.RABBITMQ_PASSWORD}@{ENV.RABBITMQ_HOST}:5672//"
 )

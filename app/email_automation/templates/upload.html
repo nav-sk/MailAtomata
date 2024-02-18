@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Scheduler</title>
+    <style>
+      /* CSS for cool and good-looking UI design */
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        margin-top: 5rem;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      input[type="file"],
+      input[type="text"],
+      input[type="password"],
+      input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .error-message {
+        color: red;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Email Automation</h1>
+      <form
+        id="uploadForm"
+        action=""
+        method="post"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="csvFile">Upload CSV:</label>
+          <input type="file" id="csvFile" name="csvFile" accept=".csv" />
+          <div id="csvFileError" class="error-message"></div>
+        </div>
+        <div class="form-group">
+          <label for="batchName">Batch Name:</label>
+          <input type="text" id="batchName" name="batchName" />
+          <div id="batchNameError" class="error-message"></div>
+        </div>
+        <!-- <div class="form-group">
+          <label for="emailColumnName">Email Column Name:</label>
+          <input type="text" id="emailColumnName" name="emailColumnName" />
+          <div id="emailColumnNameError" class="error-message"></div>
+        </div> -->
+        <div class="form-group">
+          <label for="secretKey">Secret Key:</label>
+          <input type="password" id="secretKey" name="secretKey" />
+          <div id="secretKeyError" class="error-message"></div>
+        </div>
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+
+    <script>
+      // JavaScript for necessary validations
+      const form = document.getElementById("uploadForm");
+      const csvFileInput = document.getElementById("csvFile");
+      const batchNameInput = document.getElementById("batchName");
+      // const emailColumnNameInput = document.getElementById("emailColumnName");
+      const secretKeyInput = document.getElementById("secretKey");
+
+      form.addEventListener("submit", function (event) {
+        let isValid = true;
+
+        // Validate CSV file format
+        if (!csvFileInput.value.endsWith(".csv")) {
+          document.getElementById("csvFileError").textContent =
+            "Please upload a CSV file.";
+          isValid = false;
+        } else {
+          document.getElementById("csvFileError").textContent = "";
+        }
+
+        // Validate batch name
+        if (batchNameInput.value.trim() === "") {
+          document.getElementById("batchNameError").textContent =
+            "Please enter a batch name.";
+          isValid = false;
+        } else {
+          document.getElementById("batchNameError").textContent = "";
+        }
+
+        // Validate email column name
+        // if (emailColumnNameInput.value.trim() === "") {
+        //   document.getElementById("emailColumnNameError").textContent =
+        //     "Please enter an email column name.";
+        //   isValid = false;
+        // } else {
+        //   document.getElementById("emailColumnNameError").textContent = "";
+        // }
+
+        // Validate secret key
+        if (secretKeyInput.value.trim() === "") {
+          document.getElementById("secretKeyError").textContent =
+            "Please enter a secret key.";
+          isValid = false;
+        } else {
+          document.getElementById("secretKeyError").textContent = "";
+        }
+        if (!isValid) {
+          event.preventDefault(); // Prevent form submission if there are validation errors
+        }
+      });
+    </script>
+  </body>
+</html>

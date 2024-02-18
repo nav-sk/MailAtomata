@@ -13,7 +13,6 @@ class CeleryTask(Task):
         return super().on_failure(exc, task_id, args, kwargs, einfo)
 
 
-print("Hello")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 app = Celery("mail_automation", task_cls="core.celery:CeleryTask")
 app.config_from_object("django.conf:settings", namespace="CELERY")

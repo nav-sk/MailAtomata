@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Scheduler</title>
+    <style>
+      /* CSS for cool and good-looking UI design */
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+      }
+
+      .container {
+        max-width: 80%;
+        margin: 0 auto;
+        margin-top: 5rem;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .table-container {
+        margin-top: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        text-align: center;
+      }
+
+      tr > th:last-child {
+        width: 150px;
+        margin: 0;
+      }
+      tr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .button-container {
+        display: flex;
+        width: 150px;
+        justify-content: space-between;
+      }
+
+      .button-container button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .button-container button.start {
+        background-color: #4caf50;
+        color: #fff;
+      }
+
+      .button-container button.delete {
+        background-color: #f44336;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Email Automation</h1>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Column 1</th>
+              <th>Column 2</th>
+              <th>Column 3</th>
+              <th>Column 4</th>
+              <th>Column 5</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Data 1</td>
+              <td>Data 2</td>
+              <td>Data 3</td>
+              <td>Data 4</td>
+              <td>Data 5</td>
+              <td class="button-container">
+                <button class="start">Start</button>
+                <button class="delete">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Data 1</td>
+              <td>Data 2</td>
+              <td>Data 3</td>
+              <td>Data 4</td>
+              <td>Data 5</td>
+              <td class="button-container">
+                <button class="start">Start</button>
+                <button class="delete">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td>Data 1</td>
+              <td>Data 2</td>
+              <td>Data 3</td>
+              <td>Data 4</td>
+              <td>Data 5</td>
+              <td class="button-container">
+                <button class="start">Start</button>
+                <button class="delete">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

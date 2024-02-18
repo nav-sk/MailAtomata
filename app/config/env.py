@@ -2,13 +2,14 @@ import os
 
 
 class ENV:
-    MYSQL_ROOT_PASSWORD = "test"
     MYSQL_USER = "root"
     MYSQL_PASSWORD = "root"
     MYSQL_DATABASE = "app_db"
+    MYSQL_HOST = "localhost"
     RABBITMQ_USER = "guest"
     RABBITMQ_PASSWORD = "guest"
     RABBITMQ_HOST = "localhost"
+    USER_SECRET_KEY = "secret"
 
     @classmethod
     def init_env(cls):
