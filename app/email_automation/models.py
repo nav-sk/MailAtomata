@@ -22,7 +22,7 @@ class Email(models.Model):
     id = models.CharField(
         max_length=100, primary_key=True, default=uuid.uuid4, editable=False
     )
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name="emails")
     config = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

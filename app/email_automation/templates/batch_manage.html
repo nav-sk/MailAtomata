@@ -39,6 +39,7 @@
       th,
       td {
         padding: 10px;
+        width: 150px;
         text-align: left;
         text-align: center;
       }
@@ -81,20 +82,23 @@
   <body>
     <div class="container">
       <h1>Email Automation</h1>
+      {% if error %}
+      <p style="color: red">{{ error }}</p>
+      {% endif %}
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>Column 1</th>
-              <th>Column 2</th>
-              <th>Column 3</th>
-              <th>Column 4</th>
-              <th>Column 5</th>
+              <th>Batch Name</th>
+              <th>Total Targets</th>
+              <th>Sent</th>
+              <th>Failed</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <!-- <tr>
               <td>Data 1</td>
               <td>Data 2</td>
               <td>Data 3</td>
@@ -104,32 +108,101 @@
                 <button class="start">Start</button>
                 <button class="delete">Delete</button>
               </td>
-            </tr>
+            </tr> -->
+            {% for batch in batches %}
             <tr>
-              <td>Data 1</td>
-              <td>Data 2</td>
-              <td>Data 3</td>
-              <td>Data 4</td>
-              <td>Data 5</td>
+              <td>{{ batch.name }}</td>
+              <td>{{ batch.total_emails }}</td>
+              <td>{{ batch.completed_emails }}</td>
+              <td>{{ batch.failed_emails }}</td>
+              <td
+                style="color: {% if batch.status == 'COMPLETED' %}green{% elif batch.status == 'FAILED' %}red{% else %}black{% endif %};"
+              >
+                {{ batch.status }}
+              </td>
               <td class="button-container">
-                <button class="start">Start</button>
-                <button class="delete">Delete</button>
+                <button
+                  class="start"
+                  {%
+                  if
+                  batch.status
+                  !="PENDING"
+                  %}disabled{%
+                  endif
+                  %}
+                  data-batch-id="{{ batch.id }}"
+                >
+                  Start
+                </button>
+                <button class="delete" data-batch-id="{{ batch.id }}">
+                  Delete
+                </button>
               </td>
             </tr>
-            <tr>
-              <td>Data 1</td>
-              <td>Data 2</td>
-              <td>Data 3</td>
-              <td>Data 4</td>
-              <td>Data 5</td>
-              <td class="button-container">
-                <button class="start">Start</button>
-                <button class="delete">Delete</button>
-              </td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
+    <script>
+      // Add click event listener to each start button
+      const startButtons = document.querySelectorAll(".start");
+      const deleteButtons = document.querySelectorAll(".delete");
+      const csrfmiddlewaretoken = "{{ csrf_token }}";
+      startButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          let batchId = this.dataset.batchId;
+          let secretKey = prompt("Please enter your secret key");
+          // Handle start action here
+          fetch("", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrfmiddlewaretoken,
+            },
+            body: JSON.stringify({
+              batchId,
+              secretKey,
+              action: "START",
+            }),
+          })
+            .then((response) => response.text())
+            .then((html) => {
+              document.write(html);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+      });
+
+      // Add click event listener to each delete button
+      deleteButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          let batchId = this.dataset.batchId;
+          let secretKey = prompt("Please enter your secret key");
+          // Handle delete action here
+          fetch("", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": csrfmiddlewaretoken,
+            },
+            body: JSON.stringify({
+              batchId,
+              secretKey,
+              action: "DELETE",
+            }),
+          })
+            .then((response) => response.text())
+            .then((html) => {
+              document.write(html);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+      });
+    </script>
   </body>
 </html>

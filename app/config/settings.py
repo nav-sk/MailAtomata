@@ -141,3 +141,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CELERY_BROKER_URL = (
     f"amqp://{ENV.RABBITMQ_USER}:{ENV.RABBITMQ_PASSWORD}@{ENV.RABBITMQ_HOST}:5672//"
 )
+
+# Email settings
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ENV.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = ENV.EMAIL_HOST_PASSWORD

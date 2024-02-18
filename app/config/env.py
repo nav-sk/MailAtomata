@@ -10,6 +10,8 @@ class ENV:
     RABBITMQ_PASSWORD = "guest"
     RABBITMQ_HOST = "localhost"
     USER_SECRET_KEY = "secret"
+    EMAIL_HOST_USER = "your_email@example.com"
+    EMAIL_HOST_PASSWORD = "your_password"
 
     @classmethod
     def init_env(cls):
