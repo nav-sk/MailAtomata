@@ -43,9 +43,8 @@ services:
   mysql:
     container_name: db
     image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: tooroot
-      MYSQL_DATABASE: main_db
+    env_file:
+      - .env
     restart: unless-stopped
     volumes:
       - db-data:/var/lib/mysql
@@ -57,9 +56,8 @@ services:
   rabbitmq:
     container_name: rabbitmq3
     image: rabbitmq:3-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=rmquser
-      - RABBITMQ_DEFAULT_PASS=rmqpass
+    env_file:
+      - .env
     ports:
       - 15672:15672
       - 5672:5672

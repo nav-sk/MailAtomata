@@ -94,21 +94,11 @@
               <th>Sent</th>
               <th>Failed</th>
               <th>Status</th>
+              <th>Created on</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <!-- <tr>
-              <td>Data 1</td>
-              <td>Data 2</td>
-              <td>Data 3</td>
-              <td>Data 4</td>
-              <td>Data 5</td>
-              <td class="button-container">
-                <button class="start">Start</button>
-                <button class="delete">Delete</button>
-              </td>
-            </tr> -->
             {% for batch in batches %}
             <tr>
               <td>{{ batch.name }}</td>
@@ -116,25 +106,23 @@
               <td>{{ batch.completed_emails }}</td>
               <td>{{ batch.failed_emails }}</td>
               <td
-                style="color: {% if batch.status == 'COMPLETED' %}green{% elif batch.status == 'FAILED' %}red{% else %}black{% endif %};"
+                style="font-weight:bold; color: {% if batch.status == 'COMPLETED' %}green{% elif batch.status == 'FAILED' %}red{% else %}black{% endif %};"
               >
                 {{ batch.status }}
               </td>
+              <td>{{ batch.created_on }}</td>
               <td class="button-container">
                 <button
                   class="start"
-                  {%
-                  if
-                  batch.status
-                  !="PENDING"
-                  %}disabled{%
-                  endif
-                  %}
+                  {% if batch.status != "PENDING" %} disabled {% endif %}
                   data-batch-id="{{ batch.id }}"
                 >
                   Start
                 </button>
-                <button class="delete" data-batch-id="{{ batch.id }}">
+                <button 
+                  class="delete" 
+                  {% if batch.status != "PENDING" %} disabled {% endif %}
+                  data-batch-id="{{ batch.id }}">
                   Delete
                 </button>
               </td>
@@ -146,19 +134,19 @@
     </div>
     <script>
       // Add click event listener to each start button
-      const startButtons = document.querySelectorAll(".start");
-      const deleteButtons = document.querySelectorAll(".delete");
-      const csrfmiddlewaretoken = "{{ csrf_token }}";
-      startButtons.forEach((button) => {
+      document.querySelectorAll(".start").forEach((button) => {
         button.addEventListener("click", function () {
           let batchId = this.dataset.batchId;
           let secretKey = prompt("Please enter your secret key");
+          if (!secretKey) {
+            return;
+          }
           // Handle start action here
           fetch("", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-CSRFToken": csrfmiddlewaretoken,
+              "X-CSRFToken": "{{ csrf_token }}",
             },
             body: JSON.stringify({
               batchId,
@@ -166,27 +154,36 @@
               action: "START",
             }),
           })
-            .then((response) => response.text())
-            .then((html) => {
-              document.write(html);
+            .then((response) => {
+              return response.status;
+            })
+            .then((status) => {
+              console.log(status);
+              if (status === 200) {
+                window.location.reload();
+              } else if (status === 403) {
+                alert("Invalid secret key");
+              }
             })
             .catch((error) => {
               console.error("Error:", error);
+              alert(error.message);
             });
         });
       });
 
       // Add click event listener to each delete button
-      deleteButtons.forEach((button) => {
+      document.querySelectorAll(".delete").forEach((button) => {
         button.addEventListener("click", function () {
           let batchId = this.dataset.batchId;
           let secretKey = prompt("Please enter your secret key");
+          if (secretKey === null) return;
           // Handle delete action here
           fetch("", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-CSRFToken": csrfmiddlewaretoken,
+              "X-CSRFToken": "{{ csrf_token }}",
             },
             body: JSON.stringify({
               batchId,
@@ -194,12 +191,20 @@
               action: "DELETE",
             }),
           })
-            .then((response) => response.text())
-            .then((html) => {
-              document.write(html);
+            .then((response) => {
+              return response.status;
+            })
+            .then((status) => {
+              console.log(status);
+              if (status === 200) {
+                window.location.reload();
+              } else if (status === 403) {
+                alert("Invalid secret key");
+              }
             })
             .catch((error) => {
               console.error("Error:", error);
+              alert(error.message);
             });
         });
       });

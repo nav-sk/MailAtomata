@@ -1,6 +1,7 @@
 import codecs
 import csv
 import re
+from datetime import datetime
 
 from config.env import ENV
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -18,15 +19,13 @@ class ValidationService:
         return secret_key == ENV.USER_SECRET_KEY
 
     @classmethod
-    def validate_csv_file(cls, csvfile: InMemoryUploadedFile):
-        with csvfile.file:
-            reader = csv.DictReader(codecs.iterdecode(csvfile, "utf-8"))
-            headers = reader.fieldnames
-            if "Email" not in headers:
-                return False, "Email column is missing"
-            if "Name" not in headers:
-                return False, "Name column is missing"
-            return True, "Valid CSV"
+    def validate_csv_file(cls, headers):
+
+        if "Email" not in headers:
+            return False, "Email column is missing"
+        if "Name" not in headers:
+            return False, "Name column is missing"
+        return True, "Valid CSV"
 
     @classmethod
     def validate_target(cls, target: dict):
@@ -54,8 +53,13 @@ class AutomationService:
         batch = Batch.objects.create(name=batch_name)
         email_targets_of_batch = []
         visited_emails = set()
-        with csvfile.file:
+        with csvfile.open("r") as csvfile:
             reader = csv.DictReader(codecs.iterdecode(csvfile, "utf-8"))
+            headers = reader.fieldnames
+
+            if ValidationService.validate_csv_file(headers)[0] is False:
+                return False, ValidationService.validate_csv_file(headers)[1]
+
             for row in reader:
                 if (
                     not ValidationService.validate_target(row)[0]
@@ -67,9 +71,11 @@ class AutomationService:
                 visited_emails.add(row["Email"])
 
         Email.objects.bulk_create(email_targets_of_batch)
+        return True, "Batch created successfully"
 
     @classmethod
     def get_batch_data(cls):
+        cls.update_all_batch_progress_status()
         batches = Batch.objects.prefetch_related("emails").all()
         data = []
         for batch in batches:
@@ -77,6 +83,7 @@ class AutomationService:
                 "id": batch.id,
                 "name": batch.name,
                 "status": batch.status,
+                "created_on": datetime.strftime(batch.created_at, "%Y-%m-%d %H:%M:%S"),
                 "total_emails": batch.emails.count(),
                 "completed_emails": batch.emails.filter(
                     status=EmailStatus.COMPLETED.value
@@ -91,12 +98,22 @@ class AutomationService:
     @classmethod
     def trigger_email_batch(cls, batch_id: str):
         batch = Batch.objects.get(id=batch_id)
-        for email in batch.emails.all():
-            task_signal.send(
-                sender=cls.__class__, email_row_id=email.id, batch_id=batch.id
-            )
+        task_signal.send(sender=cls.__class__, batch_id=batch.id)
 
     @classmethod
     def delete_batch_and_cascade_emails(cls, batch_id: str):
         batch = Batch.objects.get(id=batch_id)
         batch.delete()
+
+    @classmethod
+    def update_all_batch_progress_status(cls):
+        for batch in Batch.objects.filter(status=EmailStatus.IN_PROGRESS.value):
+            completed_emails = batch.emails.filter(
+                status=EmailStatus.COMPLETED.value
+            ).count()
+            failed_emails = batch.emails.filter(status=EmailStatus.FAILED.value).count()
+            if failed_emails > 0:
+                batch.status = EmailStatus.FAILED.value
+            elif completed_emails == batch.emails.count():
+                batch.status = EmailStatus.COMPLETED.value
+            batch.save()

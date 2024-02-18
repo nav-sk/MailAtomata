@@ -23,3 +23,6 @@ class EmailStatus(Enum):
     @classmethod
     def choices(cls):
         return [(key.value, key.name) for key in cls]
+
+# Email subject
+EMAIL_SUBJECT = "Test Mail Subject"
